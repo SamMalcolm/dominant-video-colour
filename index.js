@@ -2,56 +2,43 @@ const ColorThief = require('colorthief');
 const extractFrames = require('ffmpeg-extract-frames');
 const _cliProgress = require('cli-progress');
 const fs = require('fs');
+const colors = require('colors');
 const bar1 = new _cliProgress.Bar({}, _cliProgress.Presets.shades_classic);
-// bar1.start(200, 0);
-// bar1.update(100);
-// bar1.stop();
 
 let colours = [];
 let fileName = process.argv[2];
 
 const processData = async (fileName) => {
 	return new Promise(async (resolve, reject) => {
-
+		console.log("BREAKING VIDEO INTO FRAMES".cyan);
 		await extractFrames({
 			input: fileName,
 			output: './output/frames/frame-%d.png'
-		}).catch((err) => { console.log(err) })
-
+		}).catch((err) => { console.log(colors.red(err)) })
 		fs.readdir('./output/frames', async (err, files) => {
 			if (err) {
-				console.log("READ DIR ERROR");
-				console.log(err);
+				console.log(colors.red(err));
 			}
 			var attempts = 0;
+			console.log("GENERATING COLOURS".cyan);
+			bar1.start(files.length, attempts);
 			for (let i = 0; i < files.length; i++) {
-				console.log("EXISTS");
 				fs.exists('output/frames/' + files[i], async (exists) => {
 					if (exists) {
-						console.log("GET COLOUR");
 						let color = "";
 						try {
 							color = await ColorThief.getColor('output/frames/' + files[i]);
 							attempts++;
-
-							console.log(attempts);
-							console.log(typeof color);
-							console.log(color);
+							bar1.update(attempts);
 							if (typeof color == "object") {
-								console.log("ADDING COLOUR TO ARRAY");
-								console.log(color[0]);
-								console.log(color[1]);
-								console.log(color[2]);
 								let frameColour = {};
 								frameColour.index = files[i].indexOf('-');
 								frameColour.index = files[i].slice(frameColour.index + 1, files[i].indexOf('.'));
 								frameColour.index = parseInt(frameColour.index);
 								frameColour.colour = color;
 								colours.push(frameColour);
-								console.log("DELETING FILE");
 								fs.unlink('output/frames/' + files[i], (err) => {
-									console.log("VALUE OF I " + i);
-									console.log(colours.length + " / " + files.length);
+									if (err) { console.log(colors.red(err)); }
 									if (attempts == files.length) {
 										colours = colours.sort((a, b) => { return a.index - b.index })
 										resolve(colours);
@@ -62,8 +49,8 @@ const processData = async (fileName) => {
 							}
 						}
 						catch (e) {
-							console.log(e);
 							attempts++;
+							bar1.update(attempts);
 							if (attempts == files.length) {
 								colours = colours.sort((a, b) => { return a.index - b.index })
 								resolve(colours);
@@ -73,17 +60,16 @@ const processData = async (fileName) => {
 					}
 				});
 			}
-			console.log(colours);
 		});
 
 	});
 }
 
 const generateMarkup = (coloursArr) => {
+	bar1.stop();
 	// calc(100% / ${coloursArr.length})
-	console.log("IN RESOLVE CALL BACK");
+	console.log("GENERATING MARKUP".cyan);
 	let colourMarkup = "";
-	console.log(coloursArr.length);
 	for (let i = 0; i < coloursArr.length; i++) {
 		colourMarkup += `
 		<div style="width:100%; background-color:rgb(${coloursArr[i].colour[0]},${coloursArr[i].colour[1]},${coloursArr[i].colour[2]});"></div>`;
@@ -113,7 +99,8 @@ const generateMarkup = (coloursArr) => {
 	`;
 
 	fs.writeFile('output/html/' + fileName + '.html', markup, (err) => {
-		console.log(err);
+		if (err) { console.log(colors.red(err)); }
+		console.log("DONE!".green)
 	})
 }
 
