@@ -13,10 +13,10 @@ let fileName = process.argv[2];
 const processData = async (fileName) => {
 	return new Promise(async (resolve, reject) => {
 
-		// await extractFrames({
-		// 	input: fileName,
-		// 	output: './output/frames/frame-%d.png'
-		// }).catch((err) => { console.log(err) })
+		await extractFrames({
+			input: fileName,
+			output: './output/frames/frame-%d.png'
+		}).catch((err) => { console.log(err) })
 
 		fs.readdir('./output/frames', async (err, files) => {
 			if (err) {
@@ -28,48 +28,48 @@ const processData = async (fileName) => {
 				console.log("EXISTS");
 				fs.exists('output/frames/' + files[i], async (exists) => {
 					if (exists) {
-                        console.log("GET COLOUR");
-                        let color = "";
-                        try {
-                            color = await ColorThief.getColor('output/frames/' + files[i]);
-                            attempts++;
-                        
-						console.log(attempts);
-						console.log(typeof color);
-						console.log(color);
-						if (typeof color == "object") {
-							console.log("ADDING COLOUR TO ARRAY");
-							console.log(color[0]);
-							console.log(color[1]);
-							console.log(color[2]);
-							let frameColour = {};
-							frameColour.index = files[i].indexOf('-');
-							frameColour.index = files[i].slice(frameColour.index + 1, files[i].indexOf('.'));
-							frameColour.index = parseInt(frameColour.index);
-							frameColour.colour = color;
-							colours.push(frameColour);
-							console.log("DELETING FILE");
-							fs.unlink('output/frames/' + files[i], (err) => {
-								console.log("VALUE OF I " + i);
-								console.log(colours.length + " / " + files.length);
-								if (attempts == files.length) {
-									colours = colours.sort((a, b) => { return a.index - b.index })
-									resolve(colours);
-									fs.writeFileSync('output/json/colours.json', JSON.stringify(colours));
-								}
-							})
+						console.log("GET COLOUR");
+						let color = "";
+						try {
+							color = await ColorThief.getColor('output/frames/' + files[i]);
+							attempts++;
 
-                        }
-                    }
-                    catch (e) {
-                        console.log(e);
-                        attempts++;
-                        if (attempts == files.length) {
-                            colours = colours.sort((a, b) => { return a.index - b.index })
-                            resolve(colours);
-                            fs.writeFileSync('output/json/colours.json', JSON.stringify(colours));
-                        }
-                    }
+							console.log(attempts);
+							console.log(typeof color);
+							console.log(color);
+							if (typeof color == "object") {
+								console.log("ADDING COLOUR TO ARRAY");
+								console.log(color[0]);
+								console.log(color[1]);
+								console.log(color[2]);
+								let frameColour = {};
+								frameColour.index = files[i].indexOf('-');
+								frameColour.index = files[i].slice(frameColour.index + 1, files[i].indexOf('.'));
+								frameColour.index = parseInt(frameColour.index);
+								frameColour.colour = color;
+								colours.push(frameColour);
+								console.log("DELETING FILE");
+								fs.unlink('output/frames/' + files[i], (err) => {
+									console.log("VALUE OF I " + i);
+									console.log(colours.length + " / " + files.length);
+									if (attempts == files.length) {
+										colours = colours.sort((a, b) => { return a.index - b.index })
+										resolve(colours);
+										fs.writeFileSync('output/json/colours.json', JSON.stringify(colours));
+									}
+								})
+
+							}
+						}
+						catch (e) {
+							console.log(e);
+							attempts++;
+							if (attempts == files.length) {
+								colours = colours.sort((a, b) => { return a.index - b.index })
+								resolve(colours);
+								fs.writeFileSync('output/json/colours.json', JSON.stringify(colours));
+							}
+						}
 					}
 				});
 			}
