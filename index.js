@@ -7,14 +7,17 @@ const bar1 = new _cliProgress.Bar({}, _cliProgress.Presets.shades_classic);
 
 let colours = [];
 let fileName = process.argv[2];
-
+let frameCount = process.argv[3] || false;
 const processData = async (fileName) => {
 	return new Promise(async (resolve, reject) => {
 		console.log("BREAKING VIDEO INTO FRAMES".cyan);
-		await extractFrames({
-			input: fileName,
-			output: './output/frames/frame-%d.png'
-		}).catch((err) => { console.log(colors.red(err)) })
+		let extractionOptions = {};
+		extractionOptions.input = fileName;
+		extractionOptions.output = './output/frames/frame-%d.png';
+		if (frameCount) {
+			extractionOptions.numFrames = parseInt(frameCount);
+		}
+		await extractFrames(extractionOptions).catch((err) => { console.log(colors.red(err)) })
 		fs.readdir('./output/frames', async (err, files) => {
 			if (err) {
 				console.log(colors.red(err));

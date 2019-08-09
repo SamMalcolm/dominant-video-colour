@@ -44,8 +44,10 @@ npm install
 Then when you are ready to go, simply run:
 
 ```bash
-node index /path/to/video.mp4
+node index /path/to/video.mp4 {frame_count}
 ```
+
+Note: frame_count is optional, if provided will only produce a colour map across the entire video for the specified frames spread out over the entire video
 
 ### Important
 
