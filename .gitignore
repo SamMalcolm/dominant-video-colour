@@ -1,0 +1,5 @@
+/node_modules
+/video/*
+/output/frames/*
+/output/json/*
+/output/html/*

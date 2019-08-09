@@ -1,0 +1,18 @@
+{
+  "name": "dominate-colour-video",
+  "version": "0.0.1",
+  "description": "A tool to get the dominant colours of every frame of a video",
+  "main": "index.js",
+  "dependencies": {
+    "cli-progress": "^2.1.1",
+    "colorthief": "^2.3.0",
+    "ffmpeg": "0.0.4",
+    "ffmpeg-extract-frames": "^2.0.2"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Sam Malcolm",
+  "license": "ISC"
+}
