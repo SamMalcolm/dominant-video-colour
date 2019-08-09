@@ -1,5 +1,8 @@
 /node_modules
 /video/*
 /output/frames/*
+!/output/frames/.gitkeep
 /output/json/*
+!/output/json/.gitkeep
 /output/html/*
+!/output/html/.gitkeep
